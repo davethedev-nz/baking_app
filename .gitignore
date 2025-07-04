@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg
+*.egg-info/
+*.env
+.env
+
+# Django
+db.sqlite3
+/staticfiles/
+/media/
+
+# Docker
+*.log
+*.pid
+*.db
+*.sock
+docker-compose.override.yml
+volumes/
+postgres_data/
+
+# Virtualenv
+venv/
+
+# IDEs
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
