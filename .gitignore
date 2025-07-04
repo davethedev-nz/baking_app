@@ -8,8 +8,6 @@ __pycache__/
 
 # Django
 db.sqlite3
-/staticfiles/
-/media/
 
 # Docker
 *.log
@@ -19,6 +17,8 @@ db.sqlite3
 docker-compose.override.yml
 volumes/
 postgres_data/
+staticfiles/
+media/
 
 # Virtualenv
 venv/
