@@ -7,12 +7,22 @@ services:
     command: gunicorn member_management.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - .:/app
-    ports:
-      - "8000:8000"
+      - static_volume:/app/staticfiles
     env_file:
       - dev.env
     depends_on:
       - db
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx_proxy
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - static_volume:/app/staticfiles
+    depends_on:
+      - web
 
   db:
     image: postgres:15
@@ -26,4 +36,4 @@ services:
 
 volumes:
   postgres_data:
-
+  static_volume:
