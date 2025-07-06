@@ -30,16 +30,16 @@ BakingProject/
 
 ```bash
 # Build and run containers
-docker-compose up --build
+docker compose up --build
 
 # Run migrations
-docker-compose exec web python manage.py migrate
+docker compose exec web python manage.py migrate
 
 # Create superuser
-docker-compose exec web python manage.py createsuperuser
+docker compose exec web python manage.py createsuperuser
 
 # Import members from CSV
-docker-compose exec web python manage.py import_members /app/data/members.csv
+docker compose exec web python manage.py import_members /app/data/members.csv
 ```
 
 ## ✉️ Email Sending
@@ -58,7 +58,7 @@ Certificates are rendered by overlaying member data (e.g., business name) on a b
 
 Configure the template image in:
 ```
-/certificate_templates/BakingCert.png
+/certificate_templates/
 ```
 
 ## 🔐 Environment Variables
@@ -80,7 +80,7 @@ EMAIL_USE_TLS=True
 - Pillow
 - psycopg2
 - gunicorn
-- docker / docker-compose
+- docker / docker compose
 
 ## 📤 Deployment (WIP)
 
