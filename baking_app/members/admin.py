@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Member, EmailTemplate
+from .models import Member, EmailTemplate, EmailSignature
 
 @admin.register(Member)
 class MemberAdmin(admin.ModelAdmin):
@@ -10,4 +10,9 @@ class MemberAdmin(admin.ModelAdmin):
 @admin.register(EmailTemplate)
 class EmailTemplateAdmin(admin.ModelAdmin):
     list_display = ('name', 'subject', 'is_active')
+    ordering = ('name',)
+
+@admin.register(EmailSignature)
+class EmailsignatureAdmin(admin.ModelAdmin):
+    list_display = ('name', 'is_active')
     ordering = ('name',)
