@@ -46,7 +46,12 @@ class Command(BaseCommand):
 
             html_body = f"<p>{body_plain.replace(chr(10), '<br>')}</p>{signature_html}"
 
-            output_path = f"/tmp/{member.membership_number}_certificate.pdf"
+            # Create output directory if it doesn't exist
+            output_dir = os.path.join(settings.BASE_DIR, 'output_certs')
+            os.makedirs(output_dir, exist_ok=True)
+
+            filename = f"Membership_Certificate_{member.membership_number}.pdf"
+            output_path = os.path.join(output_dir, filename)
             self.generate_certificate(member, output_path)
 
             # Email the PDF
@@ -57,7 +62,11 @@ class Command(BaseCommand):
             )
 
             with open(output_path, "rb") as pdf_file:
-                email.attach("Membership_Certificate.pdf", pdf_file.read(), "application/pdf")
+                email.attach(f"Membership_Certificate_{member.membership_number}.pdf", pdf_file.read(), "application/pdf")
+
+            welcome_pack_path = os.path.join(settings.BASE_DIR, 'static/welcome_pack/BakingNZ_WelcomePack.pdf')
+            with open(welcome_pack_path, "rb") as pdf_file:
+                email.attach("BakingNZ_WelcomePack.pdf", pdf_file.read(), "application/pdf")
 
             email.attach_alternative(html_body, "text/html")
 
@@ -73,7 +82,7 @@ class Command(BaseCommand):
 
             self.stdout.write(self.style.SUCCESS(f"Sent certificate to {member.email}"))
 
-    def generate_certificate(self, member, output_path="certificate.pdf"):
+    def generate_certificate(self, member, output_path):
 
         template_path = os.path.join(settings.BASE_DIR, 'certificate_templates/BakingCert.png')
         background = Image.open(template_path).convert("RGB")
@@ -97,22 +106,9 @@ class Command(BaseCommand):
             x = column_x_start + (max_width - text_width) // 2
             y = start_y + i * line_height
             draw.text((x, y), line, font=font, fill="black")
-        # text_width, text_height = draw.textsize(business_name_text.strip(), font=font)
-        # print(f"text width: {text_width}")
-           
-
-        # x = column_x_start + ((column_width - text_width) // 2)
-        # print (f"x: {x}")
-
-        
-        # draw.text((x, y), business_name_text, font=font, fill="black")
-
 
         font = ImageFont.truetype(font_path, size=24)
         membership_number_text = f"{member.membership_number}"
-
-        # Coordinates (x, y) - adjust as needed
-        
         draw.text((600, 600), membership_number_text, font=font, fill="black")
 
         # Save to PDF

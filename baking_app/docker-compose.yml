@@ -9,6 +9,7 @@ services:
       - .:/app
       - static_volume:/app/staticfiles
       - ./media:/app/media
+      - ./output_certs:/app/output_certs
     env_file:
       - dev.env
     depends_on:
