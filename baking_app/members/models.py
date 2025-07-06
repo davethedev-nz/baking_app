@@ -10,3 +10,12 @@ class Member(models.Model):
 
     def __str__(self):
         return f"{self.business_name}"
+
+class EmailTemplate(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    subject = models.CharField(max_length=200)
+    body = models.TextField(help_text="Use {{ membership_number }}, {{ business_name }}, etc.")
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
