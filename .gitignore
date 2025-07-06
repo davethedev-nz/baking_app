@@ -38,5 +38,5 @@ Thumbs.db
 *.png
 *.ttf
 *.pdf
-**/output_certs/**
-**/static/**
+output_certs/
+static/

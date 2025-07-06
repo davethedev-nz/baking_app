@@ -40,6 +40,10 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_FULL_URL = os.getenv("MEDIA_FULL_URL", "http://localhost/media/")
 
+# Baking specific files
+CERT_IMAGE_FILE=os.getenv("CERT_IMAGE_FILE")
+WELCOME_PACK_FILE=os.getenv("WELCOME_PACK_FILE")
+
 # Application definition
 
 INSTALLED_APPS = [
