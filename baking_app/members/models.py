@@ -31,14 +31,14 @@ class EmailSignature(models.Model):
     def __str__(self):
         return self.name
     
-    def render_html(self):
-        html = "<p style='margin-top: 30px;'>"
+
+    def render_cid_html(self, cid="signature-image"):
+        html = "<p style='margin-top: 15px;'>"
         if self.sign_off_text:
-            html += self.sign_off_text.replace("\n", "<br>") + "<br>"
+            html += self.sign_off_text.replace("\n", "<br>") + "<br>" +"<br>"
         if self.signer_name:
             html += f"<strong>{self.signer_name}</strong><br>"
         if self.image:
-            full_url = f"{settings.MEDIA_FULL_URL}{self.image.name}"
-            html += f"<img src='{full_url}' width='200' alt='Signature'>"
+            html += f"<img src='cid:{cid}' width='200' alt='Signature'>"
         html += "</p>"
         return html
