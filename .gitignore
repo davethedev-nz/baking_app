@@ -8,6 +8,8 @@ __pycache__/
 
 # Django
 db.sqlite3
+**/migrations/*.pyc
+**/migrations/__pycache__/
 
 # Docker
 *.log
