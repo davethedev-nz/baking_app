@@ -4,4 +4,4 @@ gunicorn
 psycopg2-binary
 weasyprint
 python-dotenv
-
+Pillow>=9.0,<10.0

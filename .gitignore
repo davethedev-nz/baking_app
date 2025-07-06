@@ -32,3 +32,11 @@ venv/
 # OS files
 .DS_Store
 Thumbs.db
+
+# data fies
+*.csv
+*.png
+*.ttf
+*.pdf
+**/output_certs/**
+**/static/**
