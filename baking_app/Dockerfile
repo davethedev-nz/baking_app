@@ -13,6 +13,12 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     libjpeg-dev \
     libfreetype6 \
+    zlib1g-dev \
+    liblcms2-dev \
+    libtiff-dev \
+    libwebp-dev \
+    tcl-dev \
+    tk-dev \
     wkhtmltopdf \
     && apt-get clean
 

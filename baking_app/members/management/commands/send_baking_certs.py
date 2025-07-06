@@ -4,6 +4,7 @@ from django.core.mail import EmailMultiAlternatives
 from members.models import Member, EmailTemplate, EmailSignature
 from members.utils import render_template_string
 from email.mime.image import MIMEImage
+from PIL import Image, ImageDraw, ImageFont
 import os
 
 # TEMPLATE_PATH = 'certificate_templates/certificate_template.docx'
@@ -45,26 +46,8 @@ class Command(BaseCommand):
 
             html_body = f"<p>{body_plain.replace(chr(10), '<br>')}</p>{signature_html}"
 
-            # doc = Document(TEMPLATE_PATH)
-
-            # # Replace placeholder text in the docx template
-            # for p in doc.paragraphs:
-            #     if '{{name}}' in p.text:
-            #         p.text = p.text.replace('{{name}}', f"{member.first_name} {member.last_name}")
-            #     if '{{business}}' in p.text:
-            #         p.text = p.text.replace('{{business}}', member.business_name or '')
-
-            # # Save personalized DOCX
-            # docx_filename = os.path.join(OUTPUT_DIR, f"{member.id}_cert.docx")
-            # doc.save(docx_filename)
-
-            # # Convert to PDF using libreoffice
-            # subprocess.run([
-            #     'libreoffice', '--headless', '--convert-to', 'pdf', docx_filename,
-            #     '--outdir', OUTPUT_DIR
-            # ])
-
-            # pdf_filename = docx_filename.replace('.docx', '.pdf')
+            output_path = f"/tmp/{member.membership_number}_certificate.pdf"
+            self.generate_certificate(member, output_path)
 
             # Email the PDF
             email = EmailMultiAlternatives(
@@ -72,6 +55,10 @@ class Command(BaseCommand):
                 body=body_plain,
                 to=[member.email],
             )
+
+            with open(output_path, "rb") as pdf_file:
+                email.attach("Membership_Certificate.pdf", pdf_file.read(), "application/pdf")
+
             email.attach_alternative(html_body, "text/html")
 
                 # Attach signature image as inline
@@ -85,3 +72,67 @@ class Command(BaseCommand):
             email.send()
 
             self.stdout.write(self.style.SUCCESS(f"Sent certificate to {member.email}"))
+
+    def generate_certificate(self, member, output_path="certificate.pdf"):
+
+        template_path = os.path.join(settings.BASE_DIR, 'certificate_templates/BakingCert.png')
+        background = Image.open(template_path).convert("RGB")
+        draw = ImageDraw.Draw(background)
+
+        # Load a font
+        font_path = os.path.join(settings.BASE_DIR, 'static/fonts/GothicB.ttf')  # Optional
+        
+        line_height = 30
+
+        # Generate the business name text
+        font = ImageFont.truetype(font_path, size=line_height)
+        # business_name_text = f"{member.business_name}"
+        business_name_text = "Gluten Free Holdings Ltd T/A Gluten Free Choice"
+        column_x_start = 505          
+        max_width = 1080 - 505
+        start_y = 480 
+        wrapped_lines = self.wrap_text(draw, business_name_text, font, max_width)
+        for i, line in enumerate(wrapped_lines):
+            text_width, _ = draw.textsize(line, font=font)
+            x = column_x_start + (max_width - text_width) // 2
+            y = start_y + i * line_height
+            draw.text((x, y), line, font=font, fill="black")
+        # text_width, text_height = draw.textsize(business_name_text.strip(), font=font)
+        # print(f"text width: {text_width}")
+           
+
+        # x = column_x_start + ((column_width - text_width) // 2)
+        # print (f"x: {x}")
+
+        
+        # draw.text((x, y), business_name_text, font=font, fill="black")
+
+
+        font = ImageFont.truetype(font_path, size=24)
+        membership_number_text = f"{member.membership_number}"
+
+        # Coordinates (x, y) - adjust as needed
+        
+        draw.text((600, 600), membership_number_text, font=font, fill="black")
+
+        # Save to PDF
+        background.save(output_path, "PDF", resolution=100.0)
+
+    def wrap_text(self, draw, text, font, max_width):
+        words = text.strip().split()
+        lines = []
+        current_line = ""
+
+        for word in words:
+            test_line = f"{current_line} {word}".strip()
+            text_width, _ = draw.textsize(test_line, font=font)
+            if text_width > max_width and current_line:
+                lines.append(current_line)
+                current_line = word
+            else:
+                current_line = test_line
+
+        if current_line:
+            lines.append(current_line)
+
+        return lines
