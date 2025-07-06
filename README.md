@@ -52,7 +52,7 @@ Emails are rendered using templates with context-substitution and can include:
 
 **Important:** During development, certs are saved to `output_certs/` for preview.
 
-## 🖼️ Certificate Generation
+## 🖼️ Certificate Generation *** Required PNG file for cert generation
 
 Certificates are rendered by overlaying member data (e.g., business name) on a background image and saving as PDF.
 
@@ -60,6 +60,16 @@ Configure the template image in:
 ```
 /certificate_templates/
 ```
+Then add filename to .env file
+
+## 🖼️ Welcome Pack inclusion *** Required PDF file for attaching to email
+
+Add Welcome pack PDF to:
+
+```
+/static/welcome_pack/
+```
+Then add filename to .env file
 
 ## 🔐 Environment Variables
 
