@@ -1,9 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.core.mail import EmailMessage
 from members.models import Member, EmailTemplate
-from docx import Document
-import os
-import subprocess
 from members.utils import render_template_string
 
 # TEMPLATE_PATH = 'certificate_templates/certificate_template.docx'
@@ -26,7 +23,7 @@ class Command(BaseCommand):
 
         for member in members:
             context = {
-                'membership_number': member.first_name or '',
+                'membership_number': member.membership_number or '',
                 'business_name': member.business_name or '',
                 'email': member.email or ''
             }
