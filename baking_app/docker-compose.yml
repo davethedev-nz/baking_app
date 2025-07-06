@@ -29,10 +29,9 @@ services:
     container_name: postgres_db
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-    environment:
-      POSTGRES_DB: membersdb
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+    env_file:
+      - dev.env
+
 
 volumes:
   postgres_data:
