@@ -24,7 +24,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.ERROR("No active 'Accounts Signature' signature found."))
             return
         
-        members = Member.objects.all()
+        members = Member.objects.all().order_by('business_name')
 
         for member in members:
             context = {
