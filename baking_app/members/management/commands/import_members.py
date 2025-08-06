@@ -17,7 +17,7 @@ class Command(BaseCommand):
             with open(file_path, newline='') as csvfile:
                 reader = csv.DictReader(csvfile)
                 for row in reader:
-                    business_name = row.get('BusinessName')
+                    business_name = row.get('*ContactName')
                     membership_number = row.get('AccountNumber')
                     email = row.get('EmailAddress')
 
