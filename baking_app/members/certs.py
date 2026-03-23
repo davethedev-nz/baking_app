@@ -2,7 +2,7 @@ from django.conf import settings
 from PIL import Image, ImageDraw, ImageFont
 import os
 
-def generate_certificate(self, member, output_path):
+def generate_certificate(member, output_path):
 
         # Open the image
         template_path = os.path.join(settings.BASE_DIR, f"certificate_templates/{settings.CERT_IMAGE_FILE}")
@@ -23,7 +23,7 @@ def generate_certificate(self, member, output_path):
         start_y = 480
 
         # Ensure text fits within the image column 
-        wrapped_lines = self.wrap_text(draw, business_name_text, font, max_width)
+        wrapped_lines = wrap_text(draw, business_name_text, font, max_width)
 
         # draw text onto image 
         for i, line in enumerate(wrapped_lines):
@@ -40,7 +40,7 @@ def generate_certificate(self, member, output_path):
         # Save to PDF
         background.save(output_path, "PDF", resolution=100.0)
 
-def wrap_text(self, draw, text, font, max_width):
+def wrap_text(draw, text, font, max_width):
     words = text.strip().split()
     lines = []
     current_line = ""
