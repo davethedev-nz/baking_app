@@ -20,7 +20,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         no_send = kwargs.get('no_send', False)
-        
+        CERT_YEAR = settings.CERT_YEAR or '2026/2027'  # Default to 2026/2027 if not set
         # Load the active email template and signature
         try:
             template = EmailTemplate.objects.get(name='Membership Certificate Email', is_active=True)
@@ -38,7 +38,8 @@ class Command(BaseCommand):
             context = {
                 'membership_number': member.membership_number or '',
                 'business_name': member.business_name or '',
-                'email': member.email or ''
+                'email': member.email or '',
+                'cert_year': CERT_YEAR,
             }
             
             subject = render_template_string(template.subject, context)
@@ -57,9 +58,10 @@ class Command(BaseCommand):
             os.makedirs(output_dir, exist_ok=True)
 
             # Generate the certificate
-            filename = f"Membership_Certificate_{member.membership_number}.pdf"
+            filename_friendly_cert_year = CERT_YEAR.replace('/', '_')  # Replace '/' with '_' for filename
+            filename = f"Membership_Certificate_{member.membership_number}_{filename_friendly_cert_year}.pdf"
             output_path = os.path.join(output_dir, filename)
-            self.generate_certificate(member, output_path)
+            self.generate_certificate(CERT_YEAR, member, output_path)
 
             if no_send:
                 self.stdout.write(self.style.SUCCESS(f"Generated certificate for {member.business_name} ({member.membership_number})"))
@@ -73,7 +75,7 @@ class Command(BaseCommand):
 
                 # Attach the cert
                 with open(output_path, "rb") as pdf_file:
-                    email.attach(f"Membership_Certificate_{member.membership_number}.pdf", pdf_file.read(), "application/pdf")
+                    email.attach(filename, pdf_file.read(), "application/pdf")
 
                 # Attach the Welcome Pack
                 welcome_pack_path = os.path.join(settings.BASE_DIR, f'static/welcome_pack/{settings.WELCOME_PACK_FILE}')
@@ -95,11 +97,13 @@ class Command(BaseCommand):
 
                 self.stdout.write(self.style.SUCCESS(f"Sent certificate to {member.email}"))
 
-    def generate_certificate(self, member, output_path):
-
+    def generate_certificate(self, cert_year, member, output_path):
+        # grab cert year from settings
+        
         # Open the image
         template_path = os.path.join(settings.BASE_DIR, f"certificate_templates/{settings.CERT_IMAGE_FILE}")
         background = Image.open(template_path).convert("RGB")
+        background_width, background_height = background.size
         draw = ImageDraw.Draw(background)
 
         # Load a font
@@ -130,7 +134,15 @@ class Command(BaseCommand):
         membership_number_text = f"{member.membership_number}"
         draw.text((595, 595), membership_number_text, font=font, fill="black")
 
+        # draw cert year onto image
+        font = ImageFont.truetype(font_path, size=48)
+        cert_year_text = f"{cert_year}"
+        text_width, _ = draw.textsize(cert_year_text, font=font)
+        x = column_x_start + (max_width - text_width) // 2
+        draw.text((x, 400), cert_year_text, font=font, fill="black")
+
         # Save to PDF
+        background = background.crop((0, 0, background.width, background.height))
         background.save(output_path, "PDF", resolution=100.0)
 
     def wrap_text(self, draw, text, font, max_width):

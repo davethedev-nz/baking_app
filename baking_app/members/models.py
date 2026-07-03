@@ -14,7 +14,7 @@ class Member(models.Model):
 class EmailTemplate(models.Model):
     name = models.CharField(max_length=100, unique=True)
     subject = models.CharField(max_length=200)
-    body = models.TextField(help_text="Use $membership_number, $business_name, $email")
+    body = models.TextField(help_text="Use $membership_number, $business_name, $email, $cert_year as placeholders for dynamic content.")
     is_active = models.BooleanField(default=True)
 
     def __str__(self):

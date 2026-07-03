@@ -44,6 +44,9 @@ MEDIA_FULL_URL = os.getenv("MEDIA_FULL_URL", "http://localhost/media/")
 CERT_IMAGE_FILE=os.getenv("CERT_IMAGE_FILE")
 WELCOME_PACK_FILE=os.getenv("WELCOME_PACK_FILE")
 
+#Baking Specific settings
+CERT_YEAR=os.getenv("CERT_YEAR")
+
 # Application definition
 
 INSTALLED_APPS = [
