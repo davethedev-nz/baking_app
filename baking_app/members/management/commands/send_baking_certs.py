@@ -11,7 +11,15 @@ import os
 class Command(BaseCommand):
     help = 'Generate and email certificate PDFs to all members.'
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--no-send',
+            action='store_true',
+            help='Generate certificates without sending emails',
+        )
+
     def handle(self, *args, **kwargs):
+        no_send = kwargs.get('no_send', False)
         
         # Load the active email template and signature
         try:
@@ -53,36 +61,39 @@ class Command(BaseCommand):
             output_path = os.path.join(output_dir, filename)
             self.generate_certificate(member, output_path)
 
-            # Initialise the email
-            email = EmailMultiAlternatives(
-                subject=subject,
-                body=body_plain,
-                to=[member.email],
-            )
+            if no_send:
+                self.stdout.write(self.style.SUCCESS(f"Generated certificate for {member.business_name} ({member.membership_number})"))
+            else:
+                # Initialise the email
+                email = EmailMultiAlternatives(
+                    subject=subject,
+                    body=body_plain,
+                    to=[member.email],
+                )
 
-            # Attach the cert
-            with open(output_path, "rb") as pdf_file:
-                email.attach(f"Membership_Certificate_{member.membership_number}.pdf", pdf_file.read(), "application/pdf")
+                # Attach the cert
+                with open(output_path, "rb") as pdf_file:
+                    email.attach(f"Membership_Certificate_{member.membership_number}.pdf", pdf_file.read(), "application/pdf")
 
-            # Attach the Welcome Pack
-            welcome_pack_path = os.path.join(settings.BASE_DIR, f'static/welcome_pack/{settings.WELCOME_PACK_FILE}')
-            with open(welcome_pack_path, "rb") as pdf_file:
-                email.attach("BakingNZ_WelcomePack.pdf", pdf_file.read(), "application/pdf")
+                # Attach the Welcome Pack
+                welcome_pack_path = os.path.join(settings.BASE_DIR, f'static/welcome_pack/{settings.WELCOME_PACK_FILE}')
+                with open(welcome_pack_path, "rb") as pdf_file:
+                    email.attach("BakingNZ_WelcomePack.pdf", pdf_file.read(), "application/pdf")
 
-            # Attach HTML signature
-            email.attach_alternative(html_body, "text/html")
+                # Attach HTML signature
+                email.attach_alternative(html_body, "text/html")
 
-            # Attach signature image as inline
-            if signature and signature.image:
-                image_path = os.path.join(settings.MEDIA_ROOT, signature.image.name)
-                with open(image_path, 'rb') as f:
-                    mime_image = MIMEImage(f.read())
-                    mime_image.add_header('Content-ID', f'<{signature_cid}>')
-                    mime_image.add_header("Content-Disposition", "inline", filename="signature.png")
-                    email.attach(mime_image)
-            email.send()
+                # Attach signature image as inline
+                if signature and signature.image:
+                    image_path = os.path.join(settings.MEDIA_ROOT, signature.image.name)
+                    with open(image_path, 'rb') as f:
+                        mime_image = MIMEImage(f.read())
+                        mime_image.add_header('Content-ID', f'<{signature_cid}>')
+                        mime_image.add_header("Content-Disposition", "inline", filename="signature.png")
+                        email.attach(mime_image)
+                email.send()
 
-            self.stdout.write(self.style.SUCCESS(f"Sent certificate to {member.email}"))
+                self.stdout.write(self.style.SUCCESS(f"Sent certificate to {member.email}"))
 
     def generate_certificate(self, member, output_path):
 
@@ -117,7 +128,7 @@ class Command(BaseCommand):
         # draw membership number onto image
         font = ImageFont.truetype(font_path, size=24)
         membership_number_text = f"{member.membership_number}"
-        draw.text((600, 600), membership_number_text, font=font, fill="black")
+        draw.text((595, 595), membership_number_text, font=font, fill="black")
 
         # Save to PDF
         background.save(output_path, "PDF", resolution=100.0)

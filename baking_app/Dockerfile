@@ -19,7 +19,6 @@ RUN apt-get update && apt-get install -y \
     libwebp-dev \
     tcl-dev \
     tk-dev \
-    wkhtmltopdf \
     && apt-get clean
 
 COPY requirements.txt .
