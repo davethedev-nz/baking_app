@@ -12,20 +12,27 @@ class Member(models.Model):
         return f"{self.business_name}"
 
 class EmailTemplate(models.Model):
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(
+        max_length=100, 
+        unique=True,
+        help_text="The send_baking_certs command looks for a template named 'Membership Certificate Email'"
+    )
     subject = models.CharField(max_length=200)
     body = models.TextField(help_text="Use $membership_number, $business_name, $email, $cert_year as placeholders for dynamic content.")
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True, help_text="Only one template should be active at a time")
 
     def __str__(self):
         return self.name
 
 class EmailSignature(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(
+        max_length=100,
+        help_text="The send_baking_certs command looks for a signature named 'Accounts Signature'"
+    )
     sign_off_text = models.TextField(blank=True)
     signer_name = models.CharField(max_length=100, blank=True)
     image = models.ImageField(upload_to='signatures/', blank=True, null=True)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True, help_text="Only one signature should be active at a time")
 
     def __str__(self):
         return self.name
